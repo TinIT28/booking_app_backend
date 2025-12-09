@@ -1,7 +1,9 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
+import * as bcrypt from 'bcrypt';
+import { HydratedDocument } from 'mongoose';
 
-export type UserDocument = User & Document;
+export type UserDocument = HydratedDocument<User>;
 
 @Schema({ timestamps: true })
 export class User {
@@ -27,7 +29,7 @@ export class User {
     minlength: 8,
     select: false, // không trả password khi query
   })
-  passwordHash: string;
+  password: string;
 
   @Prop({
     required: false,
@@ -44,3 +46,18 @@ export class User {
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
+
+// pre save hook to ensure hashed password if it's modified
+UserSchema.pre('save', async function () {
+  const user = this as UserDocument;
+
+  if (!user.isModified('password')) return;
+
+  const saltRounds = Number(process.env.BCRYPT_SALT || 10);
+  user.password = await bcrypt.hash(user.password, saltRounds);
+});
+
+// instance method to compare
+UserSchema.methods.comparePassword = async function (plain: string) {
+  return bcrypt.compare(plain, this.password);
+};

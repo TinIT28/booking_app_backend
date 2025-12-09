@@ -1,20 +1,25 @@
-import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+import { ResponseInterceptor } from './common/response.interceptor';
+import { AllExceptionsFilter } from './common/http-exception.filter';
+import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   app.useGlobalPipes(
     new ValidationPipe({
-      whitelist: true, // loại bỏ field dư
-      forbidNonWhitelisted: true, // ném lỗi nếu gửi field rác
-      transform: true, // auto ép kiểu
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
     }),
   );
 
+  app.useGlobalInterceptors(new ResponseInterceptor());
+  app.useGlobalFilters(new AllExceptionsFilter());
+
   await app.listen(5050);
 
-  console.log('App connect susccess with port: 5050');
+  console.log('Server running on port 5050');
 }
 bootstrap();
