@@ -8,6 +8,9 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const port = process.env.PORT || 5050;
 
+  // Prefix all routes with /api/v1
+  app.setGlobalPrefix('api/v1');
+
   // Enable CORS
   app.enableCors({
     origin: true, // Cho phép tất cả origins, hoặc có thể chỉ định cụ thể: ['http://localhost:3000']
@@ -31,4 +34,4 @@ async function bootstrap() {
     console.log('Server running on port 5050');
   });
 }
-bootstrap();
+void bootstrap();

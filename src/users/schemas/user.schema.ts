@@ -43,6 +43,13 @@ export class User {
     enum: ['guest', 'host', 'admin'], // chỉ cho phép 3 role
   })
   role: 'guest' | 'host' | 'admin';
+
+  @Prop({
+    type: [String],
+    default: [],
+    select: false, // không trả refresh tokens khi query
+  })
+  refreshTokens: string[];
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

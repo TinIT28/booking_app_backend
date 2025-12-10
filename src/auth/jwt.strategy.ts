@@ -23,7 +23,12 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     if (!user) {
       return null;
     }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password, ...userSafe } = user.toObject ? user.toObject() : user;
-    return userSafe; // attaches to req.user
+    // Return with userId for consistency
+    return {
+      userId: payload.sub,
+      ...userSafe,
+    }; // attaches to req.user
   }
 }

@@ -283,4 +283,34 @@ export class UsersService {
       name: user.name,
     };
   }
+
+  // ---------------------------------------
+  // REFRESH TOKEN MANAGEMENT
+  // ---------------------------------------
+  async addRefreshToken(userId: string, refreshToken: string): Promise<void> {
+    await this.userModel.findByIdAndUpdate(userId, {
+      $push: { refreshTokens: refreshToken },
+    });
+  }
+
+  async removeRefreshToken(
+    userId: string,
+    refreshToken: string,
+  ): Promise<void> {
+    await this.userModel.findByIdAndUpdate(userId, {
+      $pull: { refreshTokens: refreshToken },
+    });
+  }
+
+  async removeAllRefreshTokens(userId: string): Promise<void> {
+    await this.userModel.findByIdAndUpdate(userId, {
+      $set: { refreshTokens: [] },
+    });
+  }
+
+  async findByIdWithRefreshTokens(
+    userId: string,
+  ): Promise<UserDocument | null> {
+    return this.userModel.findById(userId).select('+refreshTokens');
+  }
 }
